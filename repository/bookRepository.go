@@ -53,6 +53,9 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 
 	filter := bson.D{{"id", book.ID}}
 
+	// to change updated date
+	book.UpdatedDate = primitive.NewDateTimeFromTime(time.Now())
+
 	// mongodb.driver
 	result, err := b.BookCollection.ReplaceOne(ctx, filter, book)
 
@@ -146,7 +149,7 @@ func (b BookRepository) Delete(id primitive.ObjectID) (bool, error) {
 
 }
 
-// constructor =>
+// this method like constructor (#C) =>
 
 func NewBookRepository(dbClient *mongo.Collection) BookRepository {
 	return BookRepository{BookCollection: dbClient}

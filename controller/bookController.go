@@ -15,6 +15,12 @@ type Controller struct {
 	Repo repository.IBookRepository
 }
 
+// this method like constructor (#C) =>
+
+func NewBookController(repo repository.IBookRepository) Controller {
+	return Controller{Repo: repo}
+}
+
 // GetAllBooks => To get request for listing all of books
 func (cont Controller) GetAllBooks(c echo.Context) error {
 	bookList, err := cont.Repo.GetAll()

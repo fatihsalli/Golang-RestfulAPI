@@ -14,8 +14,10 @@ import (
 //TODO: #1: models klasörü yerine "models.go" ismi "models.go" olarak değiştirildi.
 // ====> Soru klasör içinde olmayınca package ismi mainde kalıyor ve referans verirken hata alıyoruz???
 // devamı ===> program ayağa kalkerken hata aldık
+
 //TODO: #2: object id yerine uuid(v4) veya guid olarak değiştirildi.
 //TODO: #3: createddate ve updateddate değerleri eklendi
+//TODO: #4: controller tarafında da nesne üretme işi metot ile tanımlanacak (NewBookController)
 
 func main() {
 	e := echo.New()
@@ -25,8 +27,8 @@ func main() {
 	//TODO:Value yerine referans olarak verilecek
 	BookRepository := repository.NewBookRepository(dbClient)
 
-	//TODO:constructor gibi metot tanımlanacak
-	BookController := controller.Controller{Repo: BookRepository}
+	// to create new controller
+	BookController := controller.NewBookController(BookRepository)
 
 	//TODO:controller constructor metotu içine // Routing group
 	e.GET("/books", BookController.GetAllBooks)
