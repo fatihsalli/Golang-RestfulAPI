@@ -19,9 +19,9 @@ type BookRepository struct {
 type IBookRepository interface {
 	Insert(book models.Book) (bool, error)
 	GetAll() ([]models.Book, error)
-	GetBookById(id primitive.ObjectID) (models.Book, error)
+	GetBookById(id string) (models.Book, error)
 	Update(book models.Book) (bool, error)
-	Delete(id primitive.ObjectID) (bool, error)
+	Delete(id string) (bool, error)
 }
 
 // Insert method => to create new book
@@ -110,7 +110,7 @@ func (b BookRepository) GetAll() ([]models.Book, error) {
 }
 
 // GetBookById Method => to find a single book with id
-func (b BookRepository) GetBookById(id primitive.ObjectID) (models.Book, error) {
+func (b BookRepository) GetBookById(id string) (models.Book, error) {
 	var book models.Book
 
 	// to open connection
@@ -128,7 +128,7 @@ func (b BookRepository) GetBookById(id primitive.ObjectID) (models.Book, error) 
 }
 
 // Delete Method => to delete a book from books by id
-func (b BookRepository) Delete(id primitive.ObjectID) (bool, error) {
+func (b BookRepository) Delete(id string) (bool, error) {
 	// to open connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

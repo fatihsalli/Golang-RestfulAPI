@@ -3,6 +3,7 @@ package main
 import (
 	"RestfulWithEcho/app"
 	"RestfulWithEcho/repository"
+	"RestfulWithEcho/service"
 	"context"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,24 +19,30 @@ import (
 //TODO: #2: object id yerine uuid(v4) veya guid olarak değiştirildi.
 //TODO: #3: createddate ve updateddate değerleri eklendi
 //TODO: #4: app tarafında da nesne üretme işi metot ile tanımlanacak (NewBookController)
+//TODO: #5: servis katmanı oluşturuldu. Dto nesneleri tanımlandı. Controller yerine handler ismi verildi.
 
 func main() {
 	e := echo.New()
 
 	dbClient := ConnectDB().Database("booksDB").Collection("books")
 
-	//TODO:Value yerine referans olarak verilecek
+	//TODO:Value yerine referans olarak verilecek aşağıdaki değerler???
+
+	// to create new repository
 	BookRepository := repository.NewBookRepository(dbClient)
 
+	// to create new service
+	BookService := service.NewBookService(BookRepository)
+
 	// to create new app
-	BookController := app.NewBookController(BookRepository)
+	BookHandler := app.NewBookHandler(BookService)
 
 	//TODO:app constructor metotu içine // Routing group
-	e.GET("/books", BookController.GetAllBooks)
-	e.GET("/books/:id", BookController.GetBookById)
-	e.POST("/books", BookController.CreateBook)
-	e.PUT("/books", BookController.UpdateBook)
-	e.DELETE("/books/:id", BookController.DeleteBook)
+	e.GET("/books", BookHandler.GetAllBooks)
+	e.GET("/books/:id", BookHandler.GetBookById)
+	e.POST("/books", BookHandler.CreateBook)
+	e.PUT("/books", BookHandler.UpdateBook)
+	e.DELETE("/books/:id", BookHandler.DeleteBook)
 	e.Start(":8080")
 }
 
