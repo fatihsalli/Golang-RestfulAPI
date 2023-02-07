@@ -34,7 +34,7 @@ func (b BookService) Insert(bookDto dtos.BookCreateDto) (bool, error) {
 	book.Quantity = bookDto.Quantity
 	book.Author = bookDto.Author
 	// to create id and created date value
-	book.ID = uuid.New()
+	book.ID = uuid.New().String()
 	book.CreatedDate = primitive.NewDateTimeFromTime(time.Now())
 
 	result, err := b.Repository.Insert(book)

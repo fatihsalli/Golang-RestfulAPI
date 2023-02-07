@@ -46,13 +46,25 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	filter := bson.D{{"id", book.ID}}
-
 	// to change updated date
 	book.UpdatedDate = primitive.NewDateTimeFromTime(time.Now())
 
+	// => Update => update + insert = upsert
+
+	filter := bson.D{{"id", book.ID}}
+
+	// => if we use this CreatedDate and id value will be null, so we have to use "UpdateOne"
+	//replacement := models.Book{Title: book.Title, Quantity: book.Quantity, Author: book.Author, UpdatedDate: book.UpdatedDate}
+
+	// => to update for one parameter
+	//update := bson.D{{"$set", bson.D{{"title", book.Title}}}}
+
+	// => if we have to chance more than one parameter we have to write like this
+	update := bson.D{{"$set", bson.D{{"title", book.Title},
+		{"author", book.Author}, {"quantity", book.Quantity}, {"updateddate", book.UpdatedDate}}}}
+
 	// mongodb.driver
-	result, err := b.BookCollection.ReplaceOne(ctx, filter, book)
+	result, err := b.BookCollection.UpdateOne(ctx, filter, update)
 
 	if result.ModifiedCount <= 0 || err != nil {
 		return false, errors.New("failed modify")
@@ -60,25 +72,6 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 
 	return true, nil
 }
-
-//// Update method => to change exist book
-//func (b BookRepository) Update(book models.Book) (bool, error) {
-//	// to open connection
-//	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-//	defer cancel()
-//
-//	filter := bson.D{{"id", book.ID}}
-//
-//	// Update => update + insert = upsert olayını gerçekleştirebiliyoruz. Settings created datei değiştirmeden güncelleyebiliriz.
-//	// mongodb.driver
-//	result, err := b.BookCollection.InsertOne(ctx, filter, book)
-//
-//	if result.ModifiedCount <= 0 || err != nil {
-//		return false, errors.New("failed modify")
-//	}
-//
-//	return true, nil
-//}
 
 // GetAll Method => to list every books
 func (b BookRepository) GetAll() ([]models.Book, error) {
