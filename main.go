@@ -1,7 +1,7 @@
 package main
 
 import (
-	"RestfulWithEcho/controller"
+	"RestfulWithEcho/app"
 	"RestfulWithEcho/repository"
 	"context"
 	"github.com/labstack/echo/v4"
@@ -17,7 +17,7 @@ import (
 
 //TODO: #2: object id yerine uuid(v4) veya guid olarak değiştirildi.
 //TODO: #3: createddate ve updateddate değerleri eklendi
-//TODO: #4: controller tarafında da nesne üretme işi metot ile tanımlanacak (NewBookController)
+//TODO: #4: app tarafında da nesne üretme işi metot ile tanımlanacak (NewBookController)
 
 func main() {
 	e := echo.New()
@@ -27,10 +27,10 @@ func main() {
 	//TODO:Value yerine referans olarak verilecek
 	BookRepository := repository.NewBookRepository(dbClient)
 
-	// to create new controller
-	BookController := controller.NewBookController(BookRepository)
+	// to create new app
+	BookController := app.NewBookController(BookRepository)
 
-	//TODO:controller constructor metotu içine // Routing group
+	//TODO:app constructor metotu içine // Routing group
 	e.GET("/books", BookController.GetAllBooks)
 	e.GET("/books/:id", BookController.GetBookById)
 	e.POST("/books", BookController.CreateBook)
@@ -40,6 +40,7 @@ func main() {
 }
 
 // TODO: Ayrı bir yer ya da repository constructına
+
 func ConnectDB() *mongo.Client {
 	// we can use connection string => "mongodb://localhost:27017"
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))

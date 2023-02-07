@@ -4,7 +4,6 @@ import (
 	"RestfulWithEcho/models"
 	"context"
 	"errors"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -30,10 +29,6 @@ func (b BookRepository) Insert(book models.Book) (bool, error) {
 	// to open connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
-	// to create id and created date value
-	book.ID = uuid.New()
-	book.CreatedDate = primitive.NewDateTimeFromTime(time.Now())
 
 	// mongodb.driver
 	result, err := b.BookCollection.InsertOne(ctx, book)
