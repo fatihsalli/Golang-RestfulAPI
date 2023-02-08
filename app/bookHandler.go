@@ -10,7 +10,6 @@ import (
 	"sync"
 )
 
-// TODO:Swaggo kütüphanesi yüklenecek
 type BookHandler struct {
 	Service service.IBookService
 }
@@ -24,13 +23,13 @@ func GetSingleInstancesHandler(service service.IBookService) *BookHandler {
 		lock.Lock()
 		defer lock.Unlock()
 		if singleInstanceHandler == nil {
-			fmt.Println("Creating single instance now.")
+			fmt.Println("Creating single handle instance now.")
 			singleInstanceHandler = &BookHandler{Service: service}
 		} else {
-			fmt.Println("Single instance already created.")
+			fmt.Println("Single handle instance already created.")
 		}
 	} else {
-		fmt.Println("Single instance already created.")
+		fmt.Println("Single handle instance already created.")
 	}
 
 	return singleInstanceHandler

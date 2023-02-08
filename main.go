@@ -10,7 +10,6 @@ import (
 //TODO: #1: models klasörü yerine "models.go" ismi "models.go" olarak değiştirildi.
 // ====> Soru klasör içinde olmayınca package ismi mainde kalıyor ve referans verirken hata alıyoruz???
 // devamı ===> program ayağa kalkerken hata aldık
-
 //TODO: #2: object id yerine uuid(v4) veya guid olarak değiştirildi. Sonrasında string olarak değiştirildi.
 //TODO: #3: createddate ve updateddate değerleri eklendi
 //TODO: #4: app tarafında da nesne üretme işi metot ile tanımlanacak (NewBookController)
@@ -37,5 +36,9 @@ func main() {
 	BookHandler := app.GetSingleInstancesHandler(BookService)
 
 	e := app.RouteHandler(BookHandler)
+
 	e.Start(":8080")
 }
+
+// TODO:Swaggo kütüphanesi yüklenecek
+// TODO:Errorlarım neden client tarafında okunamıyor. Custom Response oluşturmak???

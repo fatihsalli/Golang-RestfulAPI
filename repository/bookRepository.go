@@ -27,13 +27,13 @@ func GetSingleInstancesRepository(dbClient *mongo.Collection) *BookRepository {
 		lock.Lock()
 		defer lock.Unlock()
 		if singleInstanceRepo == nil {
-			fmt.Println("Creating single instance now.")
+			fmt.Println("Creating single repository instance now.")
 			singleInstanceRepo = &BookRepository{BookCollection: dbClient}
 		} else {
-			fmt.Println("Single instance already created.")
+			fmt.Println("Single repository instance already created.")
 		}
 	} else {
-		fmt.Println("Single instance already created.")
+		fmt.Println("Single repository instance already created.")
 	}
 
 	return singleInstanceRepo
@@ -111,7 +111,7 @@ func (b BookRepository) GetAll() ([]models.Book, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	//cursor olarak datayı çekerek Next ile database de gerekli datayı çekiyoruz(C# IQueryable gibi)
+	//We can think of "Cursor" like a request. We pull the data from the database with the "Next" command. (C# => IQueryable)
 	result, err := b.BookCollection.Find(ctx, bson.M{})
 	defer result.Close(ctx)
 

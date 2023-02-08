@@ -24,13 +24,13 @@ func GetSingleInstancesService(repository repository.IBookRepository) *BookServi
 		lock.Lock()
 		defer lock.Unlock()
 		if singleInstanceService == nil {
-			fmt.Println("Creating single instance now.")
+			fmt.Println("Creating single service instance now.")
 			singleInstanceService = &BookService{Repository: repository}
 		} else {
-			fmt.Println("Single instance already created.")
+			fmt.Println("Single service instance already created.")
 		}
 	} else {
-		fmt.Println("Single instance already created.")
+		fmt.Println("Single service instance already created.")
 	}
 
 	return singleInstanceService
