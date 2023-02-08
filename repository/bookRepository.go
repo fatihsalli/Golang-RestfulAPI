@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"time"
 )
@@ -22,6 +23,11 @@ type IBookRepository interface {
 	GetBookById(id string) (models.Book, error)
 	Update(book models.Book) (bool, error)
 	Delete(id string) (bool, error)
+}
+
+// NewBookRepository => this method like constructor (#C) =>
+func NewBookRepository(dbClient *mongo.Collection) BookRepository {
+	return BookRepository{BookCollection: dbClient}
 }
 
 // Insert method => to create new book
@@ -49,8 +55,8 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 	// to change updated date
 	book.UpdatedDate = primitive.NewDateTimeFromTime(time.Now())
 
-	// => Update => update + insert = upsert
-
+	// => Update => update + insert = upsert => opt is not necessary ???
+	opt := options.Update().SetUpsert(true)
 	filter := bson.D{{"id", book.ID}}
 
 	// => if we use this CreatedDate and id value will be null, so we have to use "UpdateOne"
@@ -64,7 +70,7 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 		{"author", book.Author}, {"quantity", book.Quantity}, {"updateddate", book.UpdatedDate}}}}
 
 	// mongodb.driver
-	result, err := b.BookCollection.UpdateOne(ctx, filter, update)
+	result, err := b.BookCollection.UpdateOne(ctx, filter, update, opt)
 
 	if result.ModifiedCount <= 0 || err != nil {
 		return false, errors.New("failed modify")
@@ -135,10 +141,4 @@ func (b BookRepository) Delete(id string) (bool, error) {
 
 	return true, nil
 
-}
-
-// this method like constructor (#C) =>
-
-func NewBookRepository(dbClient *mongo.Collection) BookRepository {
-	return BookRepository{BookCollection: dbClient}
 }

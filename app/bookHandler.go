@@ -19,6 +19,17 @@ func NewBookHandler(service service.IBookService) BookHandler {
 	return BookHandler{Service: service}
 }
 
+func RouteHandler(b BookHandler) *echo.Echo {
+	e := echo.New()
+	e.GET("/books", b.GetAllBooks)
+	e.GET("/books/:id", b.GetBookById)
+	e.POST("/books", b.CreateBook)
+	e.PUT("/books", b.UpdateBook)
+	e.DELETE("/books/:id", b.DeleteBook)
+
+	return e
+}
+
 // GetAllBooks => To get request for listing all of books
 func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
