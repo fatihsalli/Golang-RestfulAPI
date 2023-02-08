@@ -3,9 +3,11 @@ package app
 import (
 	"RestfulWithEcho/dtos"
 	"RestfulWithEcho/service"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
+	"sync"
 )
 
 // TODO:Swaggo kütüphanesi yüklenecek
@@ -13,20 +15,40 @@ type BookHandler struct {
 	Service service.IBookService
 }
 
-// this method like constructor (#C) =>
+// with singleton pattern to create just one Handler we have to write like this or using once. Otherwise, every thread will create new Handler.
+var lock = &sync.Mutex{}
+var singleInstanceHandler *BookHandler
 
+func GetSingleInstancesHandler(service service.IBookService) *BookHandler {
+	if singleInstanceHandler == nil {
+		lock.Lock()
+		defer lock.Unlock()
+		if singleInstanceHandler == nil {
+			fmt.Println("Creating single instance now.")
+			singleInstanceHandler = &BookHandler{Service: service}
+		} else {
+			fmt.Println("Single instance already created.")
+		}
+	} else {
+		fmt.Println("Single instance already created.")
+	}
+
+	return singleInstanceHandler
+}
+
+// NewBookHandler => this method like constructor (#C) =>
 func NewBookHandler(service service.IBookService) BookHandler {
 	return BookHandler{Service: service}
 }
 
-func RouteHandler(b BookHandler) *echo.Echo {
+// RouteHandler => to create new route
+func RouteHandler(b *BookHandler) *echo.Echo {
 	e := echo.New()
 	e.GET("/books", b.GetAllBooks)
 	e.GET("/books/:id", b.GetBookById)
 	e.POST("/books", b.CreateBook)
 	e.PUT("/books", b.UpdateBook)
 	e.DELETE("/books/:id", b.DeleteBook)
-
 	return e
 }
 

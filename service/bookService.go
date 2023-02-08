@@ -4,13 +4,36 @@ import (
 	"RestfulWithEcho/dtos"
 	"RestfulWithEcho/models"
 	"RestfulWithEcho/repository"
+	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"sync"
 	"time"
 )
 
 type BookService struct {
 	Repository repository.IBookRepository
+}
+
+// with singleton pattern to create just one Service we have to write like this or using once. Otherwise, every thread will create new Service.
+var lock = &sync.Mutex{}
+var singleInstanceService *BookService
+
+func GetSingleInstancesService(repository repository.IBookRepository) *BookService {
+	if singleInstanceService == nil {
+		lock.Lock()
+		defer lock.Unlock()
+		if singleInstanceService == nil {
+			fmt.Println("Creating single instance now.")
+			singleInstanceService = &BookService{Repository: repository}
+		} else {
+			fmt.Println("Single instance already created.")
+		}
+	} else {
+		fmt.Println("Single instance already created.")
+	}
+
+	return singleInstanceService
 }
 
 type IBookService interface {

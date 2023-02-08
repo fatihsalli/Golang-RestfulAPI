@@ -4,16 +4,39 @@ import (
 	"RestfulWithEcho/models"
 	"context"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"sync"
 	"time"
 )
 
 type BookRepository struct {
 	BookCollection *mongo.Collection
+}
+
+// with singleton pattern to create just one Repo we have to write like this or using once. Otherwise, every thread will create new Repo.
+var lock = &sync.Mutex{}
+var singleInstanceRepo *BookRepository
+
+func GetSingleInstancesRepository(dbClient *mongo.Collection) *BookRepository {
+	if singleInstanceRepo == nil {
+		lock.Lock()
+		defer lock.Unlock()
+		if singleInstanceRepo == nil {
+			fmt.Println("Creating single instance now.")
+			singleInstanceRepo = &BookRepository{BookCollection: dbClient}
+		} else {
+			fmt.Println("Single instance already created.")
+		}
+	} else {
+		fmt.Println("Single instance already created.")
+	}
+
+	return singleInstanceRepo
 }
 
 // IBookRepository to use for test or
