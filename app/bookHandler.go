@@ -42,12 +42,16 @@ func NewBookHandler(service service.IBookService) BookHandler {
 
 // RouteHandler => to create new route
 func RouteHandler(b *BookHandler) *echo.Echo {
+	//Echo instance
 	e := echo.New()
+
+	//Routes
 	e.GET("/books", b.GetAllBooks)
 	e.GET("/books/:id", b.GetBookById)
 	e.POST("/books", b.CreateBook)
 	e.PUT("/books", b.UpdateBook)
 	e.DELETE("/books/:id", b.DeleteBook)
+
 	return e
 }
 
@@ -56,7 +60,7 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, bookList)
@@ -73,9 +77,9 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return c.JSON(http.StatusNotFound, err)
+			return c.JSON(http.StatusNotFound, err.Error())
 		}
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, book)
@@ -89,13 +93,13 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 
 	// We parse the data as json into the struct
 	if err := c.Bind(&bookDto); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	result, err := h.Service.Insert(bookDto)
 
 	if err != nil || result == false {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, result)
@@ -109,13 +113,13 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 
 	// We parse the data as json into the struct
 	if err := c.Bind(&bookDto); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	result, err := h.Service.Update(bookDto)
 
 	if err != nil || result == false {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, result)
@@ -132,7 +136,7 @@ func (h BookHandler) DeleteBook(c echo.Context) error {
 	result, err := h.Service.Delete(query)
 
 	if err != nil || result == false {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, result)

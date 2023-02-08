@@ -3,6 +3,7 @@ package main
 import (
 	"RestfulWithEcho/app"
 	"RestfulWithEcho/configs"
+	"RestfulWithEcho/models"
 	"RestfulWithEcho/repository"
 	"RestfulWithEcho/service"
 )
@@ -37,8 +38,13 @@ func main() {
 
 	e := app.RouteHandler(BookHandler)
 
+	// custom response
+	e.HTTPErrorHandler = app.NewHttpErrorHandler(models.NewErrorStatusCodeMaps()).Handler
+
+	// start server
 	e.Start(":8080")
 }
 
 // TODO:Swaggo kütüphanesi yüklenecek
-// TODO:Errorlarım neden client tarafında okunamıyor. Custom Response oluşturmak???
+// TODO:Custom Response oluşturulacak
+// TODO:Loglama
