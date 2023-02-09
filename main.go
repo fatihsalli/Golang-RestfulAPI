@@ -45,6 +45,6 @@ func main() {
 	e.Start(":8080")
 }
 
-// TODO:Swaggo kütüphanesi yüklenecek
+// TODO:Swagger kütüphanesi yüklenecek
 // TODO:Custom Response oluşturulacak
 // TODO:Loglama
