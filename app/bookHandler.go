@@ -40,19 +40,19 @@ func NewBookHandler(service service.IBookService) BookHandler {
 	return BookHandler{Service: service}
 }
 
-// RouteHandler => to create new route
-func RouteHandler(b *BookHandler) *echo.Echo {
+// NewRouter => to create new route
+func NewRouter(b *BookHandler) *echo.Echo {
 	//Echo instance
-	e := echo.New()
+	router := echo.New()
 
 	//Routes
-	e.GET("/books", b.GetAllBooks)
-	e.GET("/books/:id", b.GetBookById)
-	e.POST("/books", b.CreateBook)
-	e.PUT("/books", b.UpdateBook)
-	e.DELETE("/books/:id", b.DeleteBook)
+	router.GET("/books", b.GetAllBooks)
+	router.GET("/books/:id", b.GetBookById)
+	router.POST("/books", b.CreateBook)
+	router.PUT("/books", b.UpdateBook)
+	router.DELETE("/books/:id", b.DeleteBook)
 
-	return e
+	return router
 }
 
 // GetAllBooks => To get request for listing all of books
@@ -87,6 +87,7 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 }
 
 // CreateBook => To post request for creating new a book
+
 func (h BookHandler) CreateBook(c echo.Context) error {
 
 	var bookDto dtos.BookCreateDto

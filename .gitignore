@@ -20,7 +20,7 @@
 out
 gen
 
-go-swagger
+docs
 
 # Mono auto generated files
 mono_crash.*
