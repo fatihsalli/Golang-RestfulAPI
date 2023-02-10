@@ -92,9 +92,9 @@ func (b BookService) GetAll() ([]dtos.BookDto, error) {
 }
 
 func (b BookService) GetBookById(id string) (dtos.BookDto, error) {
-	result, err := b.Repository.GetBookById(id)
-
 	var bookDto dtos.BookDto
+
+	result, err := b.Repository.GetBookById(id)
 
 	if err != nil {
 		return bookDto, err

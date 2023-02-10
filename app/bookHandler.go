@@ -4,6 +4,7 @@ import (
 	"RestfulWithEcho/dtos"
 	"RestfulWithEcho/service"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
@@ -14,9 +15,22 @@ type BookHandler struct {
 	Service service.IBookService
 }
 
+// BookValidator echo validator for books
+type BookValidator struct {
+	validator *validator.Validate
+}
+
+// Validate validates books request body
+func (b *BookValidator) Validate(i interface{}) error {
+	return b.validator.Struct(i)
+}
+
 // with singleton pattern to create just one Handler we have to write like this or using once. Otherwise, every thread will create new Handler.
 var lock = &sync.Mutex{}
 var singleInstanceHandler *BookHandler
+
+// for validation
+var v = validator.New()
 
 func GetSingleInstancesHandler(service service.IBookService) *BookHandler {
 	if singleInstanceHandler == nil {
@@ -45,6 +59,8 @@ func NewRouter(b *BookHandler) *echo.Echo {
 	//Echo instance
 	router := echo.New()
 
+	router.Validator = &BookValidator{validator: v}
+
 	//Routes
 	router.GET("/books", b.GetAllBooks)
 	router.GET("/books/:id", b.GetBookById)
@@ -56,6 +72,15 @@ func NewRouter(b *BookHandler) *echo.Echo {
 }
 
 // GetAllBooks => To get request for listing all of books
+
+// GetAllBooks	 godoc
+// @Summary      List books
+// @Description  get all books
+// @Tags         books
+// @Accept       json
+// @Produce      json
+// @Param        q    query     string  false  "name search by q"  Format(email)
+// @Router       /books [get]
 func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
 
@@ -94,6 +119,10 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 
 	// We parse the data as json into the struct
 	if err := c.Bind(&bookDto); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	if err := c.Validate(bookDto); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
