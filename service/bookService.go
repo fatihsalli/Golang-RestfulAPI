@@ -45,9 +45,9 @@ type IBookService interface {
 }
 
 // NewBookService => to create new BookService
-func NewBookService(repository repository.IBookRepository) BookService {
+/*func NewBookService(r repository.IBookRepository) BookService {
 	return BookService{Repository: repository}
-}
+}*/
 
 func (b BookService) Insert(bookDto dtos.BookCreateDto) (bool, error) {
 	var book models.Book

@@ -49,9 +49,9 @@ type IBookRepository interface {
 }
 
 // NewBookRepository => this method like constructor (#C) =>
-func NewBookRepository(dbClient *mongo.Collection) BookRepository {
+/*func NewBookRepository(dbClient *mongo.Collection) BookRepository {
 	return BookRepository{BookCollection: dbClient}
-}
+}*/
 
 // Insert method => to create new book
 func (b BookRepository) Insert(book models.Book) (bool, error) {
@@ -113,7 +113,13 @@ func (b BookRepository) GetAll() ([]models.Book, error) {
 
 	//We can think of "Cursor" like a request. We pull the data from the database with the "Next" command. (C# => IQueryable)
 	result, err := b.BookCollection.Find(ctx, bson.M{})
-	defer result.Close(ctx)
+
+	defer func(result *mongo.Cursor, ctx context.Context) {
+		err := result.Close(ctx)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(result, ctx)
 
 	if err != nil {
 		log.Fatalln(err)

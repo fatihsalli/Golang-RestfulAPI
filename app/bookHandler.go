@@ -50,9 +50,9 @@ func GetSingleInstancesHandler(service service.IBookService) *BookHandler {
 }
 
 // NewBookHandler => this method like constructor (#C) =>
-func NewBookHandler(service service.IBookService) BookHandler {
+/*func NewBookHandler(s service.IBookService) BookHandler {
 	return BookHandler{Service: service}
-}
+}*/
 
 // NewRouter => to create new route
 func NewRouter(b *BookHandler) *echo.Echo {
