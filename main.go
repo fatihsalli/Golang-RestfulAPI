@@ -67,3 +67,4 @@ func main() {
 // TODO:Swagger kütüphanesi yüklenecek
 // TODO:Custom Response oluşturulacak
 // TODO:Loglama
+// TODO:go mod tidy komutu ile kullanılmayan paketleri silme sorulacak???
