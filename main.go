@@ -13,13 +13,6 @@ import (
 	"os"
 )
 
-// YAPILACAKLAR
-// TODO:Swagger kütüphanesi yüklenecek
-// TODO:Custom Response oluşturulacak
-// TODO:Loglama
-// TODO:go mod tidy komutu ile kullanılmayan paketleri silme sorulacak???
-// TODO: database name ve colleciton name de configs içine taşınacak
-
 // @title Echo Restful API
 // @description This is a sample restful server.
 
