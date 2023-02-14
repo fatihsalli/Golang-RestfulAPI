@@ -46,7 +46,7 @@ func (b BookService) Insert(book models.Book) (models.Book, error) {
 
 	// TODO: panic olmadan çözüm
 	if err != nil || result == false {
-		panic(err)
+		return book, err
 	}
 
 	return book, nil
@@ -67,7 +67,7 @@ func (b BookService) GetBookById(id string) (models.Book, error) {
 	result, err := b.Repository.GetBookById(id)
 
 	if err != nil {
-		panic(err)
+		return result, err
 	}
 
 	return result, nil
