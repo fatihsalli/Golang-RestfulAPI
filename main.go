@@ -19,17 +19,12 @@ import (
 // @host localhost:8080
 // @BasePath /api
 func main() {
-	// it has moved into app-book_handler.go
 	e := echo.New()
 
-	// to reach port => load env after that find port
+	// to reach .env file
 	_ = godotenv.Load()
-	//port := os.Getenv("PORT")
-
 	var env = os.Getenv("ENV")
-
 	config := configs.GetConfig(env)
-
 	dbClient := configs.ConnectDB(config).Database("booksDB").Collection("books")
 
 	// to create new repository with singleton pattern
@@ -51,5 +46,5 @@ func main() {
 
 	// start server
 	e.Logger.Print(fmt.Sprintf("Listening on port %s", 8080))
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", 8080)))
+	e.Logger.Fatal(e.Start(":8080"))
 }
