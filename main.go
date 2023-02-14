@@ -25,10 +25,11 @@ func main() {
 	_ = godotenv.Load()
 	var env = os.Getenv("ENV")
 	config := configs.GetConfig(env)
-	dbClient := configs.ConnectDB(config).Database("booksDB").Collection("books")
+	mongoCollection := configs.ConnectDB(config.Database.Connection).
+		Database(config.Database.DatabaseName).Collection(config.Database.CollectionName)
 
 	// to create new repository with singleton pattern
-	BookRepository := repository.GetSingleInstancesRepository(dbClient)
+	BookRepository := repository.GetSingleInstancesRepository(mongoCollection)
 
 	// to create new service with singleton pattern
 	BookService := service.GetSingleInstancesService(BookRepository)
@@ -45,6 +46,6 @@ func main() {
 	//e.HTTPErrorHandler = app.NewHttpErrorHandler(models.NewErrorStatusCodeMaps()).Handler
 
 	// start server
-	e.Logger.Print(fmt.Sprintf("Listening on port %s", 8080))
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Print(fmt.Sprintf("Listening on port %s", config.Server.Port))
+	e.Logger.Fatal(e.Start(config.Server.Port))
 }

@@ -1,7 +1,5 @@
 package configs
 
-// TODO: map[string]string => struct olarak config üzerinden oku
-
 type Config struct {
 	Server struct {
 		Port string
@@ -14,19 +12,32 @@ type Config struct {
 	}
 }
 
-var Configuration = map[string]Config{
+var Configs = map[string]Config{
 	"test": {
-		Server:   {Port: "8080", Host: "localhost"},
-		Database: {CollectionName:"mongodb://localhost:27017",DatabaseName: "booksDB", CollectionName: "books"}
+		Server: struct {
+			Port string
+			Host string
+		}{
+			Port: ":8080",
+			Host: "localhost",
 		},
-	//"qa":   {},
-	//"prod": {},
+		Database: struct {
+			Connection     string
+			DatabaseName   string
+			CollectionName string
+		}{
+			Connection:     "mongodb://localhost:27017",
+			DatabaseName:   "booksDB",
+			CollectionName: "books",
+		},
+	},
+	"qa":   {},
+	"prod": {},
 }
 
-func GetConfig(env string) map[string]string {
-	if conf, ok := configs[env]; ok {
+func GetConfig(env string) Config {
+	if conf, ok := Configs[env]; ok {
 		return conf
 	}
-	return configs["test"]
-
+	return Configs["test"]
 }
