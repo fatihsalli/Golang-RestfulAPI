@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"sync"
 	"time"
@@ -18,6 +17,8 @@ type BookRepository struct {
 	BookCollection *mongo.Collection
 }
 
+// lock iptal service gibi yapılacak
+// TODO: neden httpclientları veya databse connectionlarını singleton veya connection pool larla yönetiriz!!!
 // with singleton pattern to create just one Repo we have to write like this or using once. Otherwise, every thread will create new Repo.
 var lock = &sync.Mutex{}
 var singleInstanceRepo *BookRepository
@@ -78,8 +79,9 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 	// to change updated date
 	book.UpdatedDate = primitive.NewDateTimeFromTime(time.Now())
 
-	// => Update => update + insert = upsert => opt is not necessary ???
-	opt := options.Update().SetUpsert(true)
+	// => Update => update + insert = upsert => create ve update olarak isteği bilmediğimiz durumlarda upsert default değeri bakılacak???
+	// opt := options.Update().SetUpsert(true)
+	// atomic işlemde aynı anda birden fazla update durumunda çözüm => distributed lock
 	filter := bson.D{{"id", book.ID}}
 
 	// => if we use this CreatedDate and id value will be null, so we have to use "UpdateOne"
@@ -93,7 +95,7 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 		{"author", book.Author}, {"quantity", book.Quantity}, {"updateddate", book.UpdatedDate}}}}
 
 	// mongodb.driver
-	result, err := b.BookCollection.UpdateOne(ctx, filter, update, opt)
+	result, err := b.BookCollection.UpdateOne(ctx, filter, update)
 
 	if result.ModifiedCount <= 0 || err != nil {
 		return false, errors.New("failed modify")

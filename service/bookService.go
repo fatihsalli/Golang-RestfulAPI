@@ -15,6 +15,7 @@ type BookService struct {
 	Repository repository.IBookRepository
 }
 
+// Locka gerek yok zaten her request için single instance oluşturmalıyım
 // with singleton pattern to create just one Service we have to write like this or using once. Otherwise, every thread will create new Service.
 var lock = &sync.Mutex{}
 var singleInstanceService *BookService
@@ -37,25 +38,15 @@ func GetSingleInstancesService(repository repository.IBookRepository) *BookServi
 }
 
 type IBookService interface {
-	Insert(bookDto dtos.BookCreateDto) (bool, error)
-	GetAll() ([]dtos.BookDto, error)
-	GetBookById(id string) (dtos.BookDto, error)
-	Update(bookDto dtos.BookUpdateDto) (bool, error)
+	Insert(bookDto models.Book) (models.Book, error)
+	GetAll() ([]models.Book, error)
+	GetBookById(id string) (models.Book, error)
+	Update(bookDto models.Book) (bool, error)
 	Delete(id string) (bool, error)
 }
 
-// NewBookService => to create new BookService
-/*func NewBookService(r repository.IBookRepository) BookService {
-	return BookService{Repository: repository}
-}*/
+func (b BookService) Insert(book models.Book) (models.Book, error) {
 
-func (b BookService) Insert(bookDto dtos.BookCreateDto) (bool, error) {
-	var book models.Book
-
-	// we can use automapper, but it will cause performance loss.
-	book.Title = bookDto.Title
-	book.Quantity = bookDto.Quantity
-	book.Author = bookDto.Author
 	// to create id and created date value
 	book.ID = uuid.New().String()
 	book.CreatedDate = primitive.NewDateTimeFromTime(time.Now())
@@ -63,10 +54,10 @@ func (b BookService) Insert(bookDto dtos.BookCreateDto) (bool, error) {
 	result, err := b.Repository.Insert(book)
 
 	if err != nil || result == false {
-		return false, err
+		panic(err)
 	}
 
-	return true, nil
+	return book, nil
 }
 
 func (b BookService) GetAll() ([]dtos.BookDto, error) {

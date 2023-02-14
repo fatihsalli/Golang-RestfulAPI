@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-func ConnectDB() *mongo.Client {
+func ConnectDB(config map[string]string) *mongo.Client {
 	// we can use connection string => "mongodb://localhost:27017" => env.go -> EnvMongoURI method
-	client, err := mongo.NewClient(options.Client().ApplyURI(EnvMongoURI()))
+	client, err := mongo.NewClient(options.Client().ApplyURI(config["MONGOURI"]))
 
 	if err != nil {
 		log.Fatalln(err)

@@ -21,6 +21,7 @@ out
 gen
 
 docs
+notes.txt
 
 # Mono auto generated files
 mono_crash.*
