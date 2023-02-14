@@ -29,7 +29,7 @@ var v = validator.New()
 
 func NewBookHandler(e *echo.Echo, service service.IBookService) *BookHandler {
 
-	var router = e.Group("/books")
+	router := e.Group("/books")
 	b := &BookHandler{Service: service}
 
 	e.Validator = &BookValidator{validator: v}
@@ -52,15 +52,24 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, bookList)
+	// we can use automapper, but it will cause performance loss.
+	var bookResponse dtos.BookResponse
+	var booksResponse []dtos.BookResponse
+
+	for _, book := range bookList {
+		bookResponse.ID = book.ID
+		bookResponse.Title = book.Title
+		bookResponse.Quantity = book.Quantity
+		bookResponse.Author = book.Author
+		booksResponse = append(booksResponse, bookResponse)
+	}
+
+	return c.JSON(http.StatusOK, booksResponse)
 }
 
 // GetBookById => To get request find a book by id
 func (h BookHandler) GetBookById(c echo.Context) error {
 	query := c.Param("id")
-
-	// changed to objectId
-	//cnv, _ := primitive.ObjectIDFromHex(query)
 
 	book, err := h.Service.GetBookById(query)
 
@@ -71,7 +80,14 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, book)
+	// mapping
+	var bookResponse dtos.BookResponse
+	bookResponse.ID = book.ID
+	bookResponse.Title = book.Title
+	bookResponse.Author = book.Author
+	bookResponse.Quantity = book.Quantity
+
+	return c.JSON(http.StatusOK, bookResponse)
 
 }
 
@@ -113,14 +129,22 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 // UpdateBook => To put request for changing exist book
 func (h BookHandler) UpdateBook(c echo.Context) error {
 
-	var bookDto dtos.BookUpdateDto
+	var bookUpdateRequest dtos.BookUpdateRequest
 
 	// We parse the data as json into the struct
-	if err := c.Bind(&bookDto); err != nil {
+	if err := c.Bind(&bookUpdateRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	result, err := h.Service.Update(bookDto)
+	var book models.Book
+
+	// we can use automapper, but it will cause performance loss.
+	book.ID = bookUpdateRequest.ID
+	book.Title = bookUpdateRequest.Title
+	book.Quantity = bookUpdateRequest.Quantity
+	book.Author = bookUpdateRequest.Author
+
+	result, err := h.Service.Update(book)
 
 	if err != nil || result == false {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -133,9 +157,6 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 // DeleteBook => To delete request by id as a parameter
 func (h BookHandler) DeleteBook(c echo.Context) error {
 	query := c.Param("id")
-
-	// changed to objectId
-	//cnv, _ := primitive.ObjectIDFromHex(query)
 
 	result, err := h.Service.Delete(query)
 

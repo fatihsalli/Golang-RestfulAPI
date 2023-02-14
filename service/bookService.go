@@ -1,13 +1,11 @@
 package service
 
 import (
-	"RestfulWithEcho/dtos"
 	"RestfulWithEcho/models"
 	"RestfulWithEcho/repository"
 	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"sync"
 	"time"
 )
 
@@ -15,21 +13,14 @@ type BookService struct {
 	Repository repository.IBookRepository
 }
 
-// Locka gerek yok zaten her request için single instance oluşturmalıyım
 // with singleton pattern to create just one Service we have to write like this or using once. Otherwise, every thread will create new Service.
-var lock = &sync.Mutex{}
+// var lock = &sync.Mutex{}
 var singleInstanceService *BookService
 
 func GetSingleInstancesService(repository repository.IBookRepository) *BookService {
 	if singleInstanceService == nil {
-		lock.Lock()
-		defer lock.Unlock()
-		if singleInstanceService == nil {
-			fmt.Println("Creating single service instance now.")
-			singleInstanceService = &BookService{Repository: repository}
-		} else {
-			fmt.Println("Single service instance already created.")
-		}
+		fmt.Println("Creating single service instance now.")
+		singleInstanceService = &BookService{Repository: repository}
 	} else {
 		fmt.Println("Single service instance already created.")
 	}
@@ -53,6 +44,7 @@ func (b BookService) Insert(book models.Book) (models.Book, error) {
 
 	result, err := b.Repository.Insert(book)
 
+	// TODO: panic olmadan çözüm
 	if err != nil || result == false {
 		panic(err)
 	}
@@ -60,53 +52,28 @@ func (b BookService) Insert(book models.Book) (models.Book, error) {
 	return book, nil
 }
 
-func (b BookService) GetAll() ([]dtos.BookDto, error) {
+func (b BookService) GetAll() ([]models.Book, error) {
 	result, err := b.Repository.GetAll()
 
 	if err != nil {
 		return nil, err
 	}
 
-	var bookDto dtos.BookDto
-	var booksDto []dtos.BookDto
-
-	for _, v := range result {
-		bookDto.ID = v.ID
-		bookDto.Title = v.Title
-		bookDto.Quantity = v.Quantity
-		bookDto.Author = v.Author
-
-		booksDto = append(booksDto, bookDto)
-	}
-
-	return booksDto, nil
+	return result, nil
 }
 
-func (b BookService) GetBookById(id string) (dtos.BookDto, error) {
-	var bookDto dtos.BookDto
+func (b BookService) GetBookById(id string) (models.Book, error) {
 
 	result, err := b.Repository.GetBookById(id)
 
 	if err != nil {
-		return bookDto, err
+		panic(err)
 	}
 
-	bookDto.ID = result.ID
-	bookDto.Title = result.Title
-	bookDto.Author = result.Author
-	bookDto.Quantity = result.Quantity
-
-	return bookDto, nil
+	return result, nil
 }
 
-func (b BookService) Update(bookDto dtos.BookUpdateDto) (bool, error) {
-	var book models.Book
-
-	// we can use automapper, but it will cause performance loss.
-	book.ID = bookDto.ID
-	book.Title = bookDto.Title
-	book.Quantity = bookDto.Quantity
-	book.Author = bookDto.Author
+func (b BookService) Update(book models.Book) (bool, error) {
 	// to create updated date value
 	book.UpdatedDate = primitive.NewDateTimeFromTime(time.Now())
 

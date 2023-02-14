@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"sync"
 	"time"
 )
 
@@ -17,22 +16,14 @@ type BookRepository struct {
 	BookCollection *mongo.Collection
 }
 
-// lock iptal service gibi yapılacak
 // TODO: neden httpclientları veya databse connectionlarını singleton veya connection pool larla yönetiriz!!!
-// with singleton pattern to create just one Repo we have to write like this or using once. Otherwise, every thread will create new Repo.
-var lock = &sync.Mutex{}
+
 var singleInstanceRepo *BookRepository
 
 func GetSingleInstancesRepository(dbClient *mongo.Collection) *BookRepository {
 	if singleInstanceRepo == nil {
-		lock.Lock()
-		defer lock.Unlock()
-		if singleInstanceRepo == nil {
-			fmt.Println("Creating single repository instance now.")
-			singleInstanceRepo = &BookRepository{BookCollection: dbClient}
-		} else {
-			fmt.Println("Single repository instance already created.")
-		}
+		fmt.Println("Creating single repository instance now.")
+		singleInstanceRepo = &BookRepository{BookCollection: dbClient}
 	} else {
 		fmt.Println("Single repository instance already created.")
 	}
@@ -48,11 +39,6 @@ type IBookRepository interface {
 	Update(book models.Book) (bool, error)
 	Delete(id string) (bool, error)
 }
-
-// NewBookRepository => this method like constructor (#C) =>
-/*func NewBookRepository(dbClient *mongo.Collection) BookRepository {
-	return BookRepository{BookCollection: dbClient}
-}*/
 
 // Insert method => to create new book
 func (b BookRepository) Insert(book models.Book) (bool, error) {
