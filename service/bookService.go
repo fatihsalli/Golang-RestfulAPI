@@ -44,7 +44,6 @@ func (b BookService) Insert(book models.Book) (models.Book, error) {
 
 	result, err := b.Repository.Insert(book)
 
-	// TODO: panic olmadan çözüm
 	if err != nil || result == false {
 		return book, err
 	}
