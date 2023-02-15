@@ -16,14 +16,12 @@ type BookRepository struct {
 	BookCollection *mongo.Collection
 }
 
-// TODO: neden httpclientları veya databse connectionlarını singleton veya connection pool larla yönetiriz!!!
-
 var singleInstanceRepo *BookRepository
 
-func GetSingleInstancesRepository(dbClient *mongo.Collection) *BookRepository {
+func GetSingleInstancesRepository(mongoCollection *mongo.Collection) *BookRepository {
 	if singleInstanceRepo == nil {
 		fmt.Println("Creating single repository instance now.")
-		singleInstanceRepo = &BookRepository{BookCollection: dbClient}
+		singleInstanceRepo = &BookRepository{BookCollection: mongoCollection}
 	} else {
 		fmt.Println("Single repository instance already created.")
 	}
@@ -65,9 +63,8 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 	// to change updated date
 	book.UpdatedDate = primitive.NewDateTimeFromTime(time.Now())
 
-	// => Update => update + insert = upsert => create ve update olarak isteği bilmediğimiz durumlarda upsert default değeri bakılacak???
+	// => Update => update + insert = upsert => default value false
 	// opt := options.Update().SetUpsert(true)
-	// atomic işlemde aynı anda birden fazla update durumunda çözüm => distributed lock
 	filter := bson.D{{"id", book.ID}}
 
 	// => if we use this CreatedDate and id value will be null, so we have to use "UpdateOne"

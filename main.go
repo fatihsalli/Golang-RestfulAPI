@@ -34,13 +34,12 @@ func main() {
 	// to create new service with singleton pattern
 	BookService := service.GetSingleInstancesService(BookRepository)
 
-	// to create new app with singleton pattern
+	// to create new app
 	app.NewBookHandler(e, BookService)
 
 	docs.SwaggerInfo.Host = "localhost:8080"
 	// add swagger
 	e.GET("/swagger/*any", echoSwagger.WrapHandler)
-	// swag init -g main.go => bu komut denenecek
 
 	// custom response
 	//e.HTTPErrorHandler = app.NewHttpErrorHandler(models.NewErrorStatusCodeMaps()).Handler
