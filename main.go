@@ -13,11 +13,20 @@ import (
 	"os"
 )
 
-// @title Echo Restful API
-// @description This is a sample restful server.
+// @title           Echo Restful API
+// @version         1.0
+// @description     This is a sample restful server.
+// @termsOfService  http://swagger.io/terms/
 
-// @host localhost:8080
-// @BasePath /api
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api
 func main() {
 	e := echo.New()
 

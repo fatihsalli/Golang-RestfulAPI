@@ -29,7 +29,7 @@ var v = validator.New()
 
 func NewBookHandler(e *echo.Echo, service service.IBookService) *BookHandler {
 
-	router := e.Group("/books")
+	router := e.Group("api/books")
 	b := &BookHandler{Service: service}
 
 	e.Validator = &BookValidator{validator: v}
@@ -45,6 +45,13 @@ func NewBookHandler(e *echo.Echo, service service.IBookService) *BookHandler {
 }
 
 // GetAllBooks => To get request for listing all of books
+
+// GetAllBooks godoc
+// @Summary get all items in the book list
+// @ID get-all-books
+// @Produce json
+// @Success 200 {array} dtos.BookResponse
+// @Router /books [get]
 func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
 
@@ -68,6 +75,14 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 }
 
 // GetBookById => To get request find a book by id
+
+// GetBookById godoc
+// @Summary get a book item by ID
+// @ID get-book-by-id
+// @Produce json
+// @Param id path string true "book ID"
+// @Success 200 {object} dtos.BookResponse
+// @Router /books/{id} [get]
 func (h BookHandler) GetBookById(c echo.Context) error {
 	query := c.Param("id")
 
@@ -92,6 +107,14 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 }
 
 // CreateBook => To post request for creating new a book
+
+// CreateBook godoc
+// @Summary add a new item to the book list
+// @ID create-book
+// @Produce json
+// @Param data body dtos.BookCreateRequest true "book data"
+// @Success 201 {object} dtos.BookCreateResponse
+// @Router /books [post]
 func (h BookHandler) CreateBook(c echo.Context) error {
 
 	var bookRequest dtos.BookCreateRequest
@@ -122,11 +145,19 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 	var bookCreateResponse dtos.BookCreateResponse
 	bookCreateResponse.ID = result.ID
 
-	return c.JSON(http.StatusOK, bookCreateResponse)
+	return c.JSON(http.StatusCreated, bookCreateResponse)
 
 }
 
 // UpdateBook => To put request for changing exist book
+
+// UpdateBook godoc
+// @Summary update an item to the book list
+// @ID update-book
+// @Produce json
+// @Param data body dtos.BookUpdateRequest true "book data"
+// @Success 200 {object} bool
+// @Router /books [put]
 func (h BookHandler) UpdateBook(c echo.Context) error {
 
 	var bookUpdateRequest dtos.BookUpdateRequest
@@ -155,6 +186,14 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 }
 
 // DeleteBook => To delete request by id as a parameter
+
+// DeleteBook godoc
+// @Summary delete a book item by ID
+// @ID delete-book-by-id
+// @Produce json
+// @Param id path string true "book ID"
+// @Success 200 {object} bool
+// @Router /books/{id} [delete]
 func (h BookHandler) DeleteBook(c echo.Context) error {
 	query := c.Param("id")
 
