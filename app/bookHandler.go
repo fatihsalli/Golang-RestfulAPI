@@ -3,6 +3,7 @@ package app
 import (
 	"RestfulWithEcho/dtos"
 	"RestfulWithEcho/models"
+	"RestfulWithEcho/response"
 	"RestfulWithEcho/service"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -71,7 +72,9 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 		booksResponse = append(booksResponse, bookResponse)
 	}
 
-	return c.JSON(http.StatusOK, booksResponse)
+	return response.SuccessResponse(c, booksResponse, 200)
+
+	//return c.JSON(http.StatusOK, booksResponse)
 }
 
 // GetBookById => To get request find a book by id

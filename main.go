@@ -46,6 +46,7 @@ func main() {
 	// to create new app
 	app.NewBookHandler(e, BookService)
 
+	// if we don't use this swagger give an error
 	docs.SwaggerInfo.Host = "localhost:8080"
 	// add swagger
 	e.GET("/swagger/*any", echoSwagger.WrapHandler)
