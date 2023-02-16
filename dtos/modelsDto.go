@@ -1,5 +1,7 @@
 package dtos
 
+// proje ismi types klasör app
+
 type BookCreateRequest struct {
 	Title    string `json:"title" validate:"required,min=1,max=100"`
 	Author   string `json:"author" validate:"required,min=1,max=100"`
@@ -20,6 +22,6 @@ type BookResponse struct {
 	Quantity int    `json:"quantity"`
 }
 
-type BookCreateResponse struct {
+type CreateResponse struct {
 	ID string `json:"id"`
 }

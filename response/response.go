@@ -5,17 +5,17 @@ import (
 )
 
 type JSONSuccessResult struct {
-	Code    int         `json:"code" example:"200"`
-	Message string      `json:"message" example:"Success"`
-	Data    interface{} `json:"data"`
+	TotalItemCount int         `json:"totalitemcount"`
+	Data           interface{} `json:"data"`
 }
 
-// SuccessResponse => for custom response
-func SuccessResponse(c echo.Context, data interface{}, status int) error {
-	c.JSON(status, JSONSuccessResult{
-		Code:    status,
-		Message: "Success",
-		Data:    data,
+// array için totalItem count kullanılmadılır!!!
+
+// SuccessArrayResponse => for custom response
+func SuccessArrayResponse(c echo.Context, data interface{}, totalItemCount int) error {
+	c.JSON(200, JSONSuccessResult{
+		TotalItemCount: totalItemCount,
+		Data:           data,
 	})
 	return nil
 }

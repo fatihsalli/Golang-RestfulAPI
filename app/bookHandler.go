@@ -3,7 +3,6 @@ package app
 import (
 	"RestfulWithEcho/dtos"
 	"RestfulWithEcho/models"
-	"RestfulWithEcho/response"
 	"RestfulWithEcho/service"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -52,6 +51,7 @@ func NewBookHandler(e *echo.Echo, service service.IBookService) *BookHandler {
 // @ID get-all-books
 // @Produce json
 // @Success 200 {array} dtos.BookResponse
+// @Failure      500  {string}  Error
 // @Router /books [get]
 func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
@@ -72,9 +72,11 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 		booksResponse = append(booksResponse, bookResponse)
 	}
 
-	return response.SuccessResponse(c, booksResponse, 200)
+	//return response.SuccessResponse(c, booksResponse,)
 
-	//return c.JSON(http.StatusOK, booksResponse)
+	// TODO: SuccessResponse modeli oluşturup booksResponse yerine bunu gönderelim.
+
+	return c.JSON(http.StatusOK, booksResponse)
 }
 
 // GetBookById => To get request find a book by id
@@ -85,6 +87,7 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 // @Produce json
 // @Param id path string true "book ID"
 // @Success 200 {object} dtos.BookResponse
+// @Failure      404  {object}  error
 // @Router /books/{id} [get]
 func (h BookHandler) GetBookById(c echo.Context) error {
 	query := c.Param("id")
@@ -93,7 +96,7 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return c.JSON(http.StatusNotFound, err.Error())
+			return c.JSON(http.StatusNotFound, err)
 		}
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -116,7 +119,7 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 // @ID create-book
 // @Produce json
 // @Param data body dtos.BookCreateRequest true "book data"
-// @Success 201 {object} dtos.BookCreateResponse
+// @Success 201 {object} dtos.CreateResponse
 // @Router /books [post]
 func (h BookHandler) CreateBook(c echo.Context) error {
 
@@ -145,7 +148,7 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 	}
 
 	// we have to return new id
-	var bookCreateResponse dtos.BookCreateResponse
+	var bookCreateResponse dtos.CreateResponse
 	bookCreateResponse.ID = result.ID
 
 	return c.JSON(http.StatusCreated, bookCreateResponse)
@@ -184,6 +187,7 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	// TODO: id ve success prop struct oluşturulup result yerine
 	return c.JSON(http.StatusOK, result)
 
 }
