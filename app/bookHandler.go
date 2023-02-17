@@ -53,7 +53,7 @@ func NewBookHandler(e *echo.Echo, service service.IBookService) *BookHandler {
 // @Summary get all items in the book list
 // @ID get-all-books
 // @Produce json
-// @Success 200 {array} dtos.BookResponse
+// @Success 200 {array} response.JSONSuccessResultData
 // @Success 500 {object} errors.InternalServerError
 // @Router /books [get]
 func (h BookHandler) GetAllBooks(c echo.Context) error {
@@ -93,7 +93,7 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 // @ID get-book-by-id
 // @Produce json
 // @Param id path string true "book ID"
-// @Success 200 {object} dtos.BookResponse
+// @Success 200 {object} response.JSONSuccessResultData
 // @Success 404 {object} errors.NotFoundError
 // @Success 500 {object} errors.InternalServerError
 // @Router /books/{id} [get]
@@ -138,6 +138,7 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 // @Produce json
 // @Param data body dtos.BookCreateRequest true "book data"
 // @Success 201 {object} response.JSONSuccessResultId
+// @Success 400 {object} errors.BadRequestError
 // @Router /books [post]
 func (h BookHandler) CreateBook(c echo.Context) error {
 
@@ -145,11 +146,15 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 
 	// We parse the data as json into the struct
 	if err := c.Bind(&bookRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
+			Message: "Bad Request! Please put correct information.",
+		})
 	}
 
 	if err := c.Validate(bookRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
+			Message: "Bad Request! Please check all information.",
+		})
 	}
 
 	var book models.Book
