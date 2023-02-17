@@ -9,7 +9,7 @@ import (
 // #3- uuid(v4) with MongoDB
 
 type Book struct {
-	ID          string             `json:"id,omitempty"`
+	ID          string             `json:"_id,omitempty" bson:"_id,omitempty"`
 	CreatedDate primitive.DateTime `json:"createddate,omitempty"`
 	UpdatedDate primitive.DateTime `json:"updateddate"`
 	Title       string             `json:"title,omitempty"`

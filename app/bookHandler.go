@@ -2,9 +2,11 @@ package app
 
 import (
 	"RestfulWithEcho/dtos"
+	"RestfulWithEcho/errors"
 	"RestfulWithEcho/models"
 	"RestfulWithEcho/response"
 	"RestfulWithEcho/service"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -52,12 +54,15 @@ func NewBookHandler(e *echo.Echo, service service.IBookService) *BookHandler {
 // @ID get-all-books
 // @Produce json
 // @Success 200 {array} dtos.BookResponse
+// @Success 500 {object} errors.InternalServerError
 // @Router /books [get]
 func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
+			Message: "Something went wrong!",
+		})
 	}
 
 	// we can use automapper, but it will cause performance loss.
@@ -72,11 +77,13 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 		booksResponse = append(booksResponse, bookResponse)
 	}
 
-	//return response.SuccessResponse(c, booksResponse,)
+	// to response success result data
+	jsonSuccessResultData := response.JSONSuccessResultData{
+		TotalItemCount: len(booksResponse),
+		Data:           booksResponse,
+	}
 
-	// TODO: SuccessResponse modeli oluşturup booksResponse yerine bunu gönderelim.
-
-	return c.JSON(http.StatusOK, booksResponse)
+	return c.JSON(http.StatusOK, jsonSuccessResultData)
 }
 
 // GetBookById => To get request find a book by id
@@ -87,6 +94,8 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 // @Produce json
 // @Param id path string true "book ID"
 // @Success 200 {object} dtos.BookResponse
+// @Success 404 {object} errors.NotFoundError
+// @Success 500 {object} errors.InternalServerError
 // @Router /books/{id} [get]
 func (h BookHandler) GetBookById(c echo.Context) error {
 	query := c.Param("id")
@@ -95,9 +104,13 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return c.JSON(http.StatusNotFound, err)
+			return c.JSON(http.StatusNotFound, errors.NotFoundError{
+				Message: fmt.Sprintf("Not found exception: {%v} with id not found!", query),
+			})
 		}
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
+			Message: "Something went wrong!",
+		})
 	}
 
 	// mapping
@@ -107,7 +120,13 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 	bookResponse.Author = book.Author
 	bookResponse.Quantity = book.Quantity
 
-	return c.JSON(http.StatusOK, bookResponse)
+	// to response success result data => single one
+	jsonSuccessResultData := response.JSONSuccessResultData{
+		TotalItemCount: 1,
+		Data:           bookResponse,
+	}
+
+	return c.JSON(http.StatusOK, jsonSuccessResultData)
 
 }
 
@@ -143,7 +162,9 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 	result, err := h.Service.Insert(book)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, &errors.InternalServerError{
+			Message: "Book cannot create!",
+		})
 	}
 
 	// to response id and success boolean

@@ -48,7 +48,7 @@ func (b BookRepository) Insert(book models.Book) (bool, error) {
 	result, err := b.BookCollection.InsertOne(ctx, book)
 
 	if result.InsertedID == nil || err != nil {
-		return false, errors.New("failed add")
+		return false, errors.New("failed to add")
 	}
 
 	return true, nil
@@ -65,7 +65,7 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 
 	// => Update => update + insert = upsert => default value false
 	// opt := options.Update().SetUpsert(true)
-	filter := bson.D{{"id", book.ID}}
+	filter := bson.D{{"_id", book.ID}}
 
 	// => if we use this CreatedDate and id value will be null, so we have to use "UpdateOne"
 	//replacement := models.Book{Title: book.Title, Quantity: book.Quantity, Author: book.Author, UpdatedDate: book.UpdatedDate}
@@ -131,7 +131,7 @@ func (b BookRepository) GetBookById(id string) (models.Book, error) {
 	defer cancel()
 
 	// to find book by id
-	err := b.BookCollection.FindOne(ctx, bson.M{"id": id}).Decode(&book)
+	err := b.BookCollection.FindOne(ctx, bson.M{"_id": id}).Decode(&book)
 
 	if err != nil {
 		return book, err
@@ -147,7 +147,7 @@ func (b BookRepository) Delete(id string) (bool, error) {
 	defer cancel()
 
 	// delete by id column
-	result, err := b.BookCollection.DeleteOne(ctx, bson.M{"id": id})
+	result, err := b.BookCollection.DeleteOne(ctx, bson.M{"_id": id})
 
 	if err != nil || result.DeletedCount <= 0 {
 		return false, err
