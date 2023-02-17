@@ -61,7 +61,7 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
 
 	if err != nil {
-		log.Printf("StatusInternalServerError:%v", err)
+		log.Printf("StatusInternalServerError: %v", err)
 		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
 			Message: "Something went wrong!",
 		})
@@ -111,7 +111,7 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 				Message: fmt.Sprintf("Not found exception: {%v} with id not found!", query),
 			})
 		}
-		log.Println("Something went wrong!")
+		log.Printf("StatusInternalServerError: %v", err)
 		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
 			Message: "Something went wrong!",
 		})
@@ -151,6 +151,7 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 
 	// We parse the data as json into the struct
 	if err := c.Bind(&bookRequest); err != nil {
+		log.Printf("Bad Request. It cannot be binding! %v", err.Error())
 		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
 			Message: fmt.Sprintf("Bad Request. It cannot be binding! %v", err.Error()),
 		})
