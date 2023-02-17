@@ -10,6 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"net/http"
 )
 
@@ -60,6 +61,7 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
 
 	if err != nil {
+		log.Printf("StatusInternalServerError:%v", err)
 		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
 			Message: "Something went wrong!",
 		})
@@ -104,10 +106,12 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
+			log.Printf("Not found exception: {%v} with id not found!", query)
 			return c.JSON(http.StatusNotFound, errors.NotFoundError{
 				Message: fmt.Sprintf("Not found exception: {%v} with id not found!", query),
 			})
 		}
+		log.Println("Something went wrong!")
 		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
 			Message: "Something went wrong!",
 		})
