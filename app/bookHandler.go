@@ -139,6 +139,7 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 // @Param data body dtos.BookCreateRequest true "book data"
 // @Success 201 {object} response.JSONSuccessResultId
 // @Success 400 {object} errors.BadRequestError
+// @Success 500 {object} errors.InternalServerError
 // @Router /books [post]
 func (h BookHandler) CreateBook(c echo.Context) error {
 
@@ -147,13 +148,13 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 	// We parse the data as json into the struct
 	if err := c.Bind(&bookRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
-			Message: "Bad Request! Please put correct information.",
+			Message: fmt.Sprintf("Bad Request. It cannot be binding! %v", err.Error()),
 		})
 	}
 
 	if err := c.Validate(bookRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
-			Message: "Bad Request! Please check all information.",
+			Message: fmt.Sprintf("Bad Request! %v", err.Error()),
 		})
 	}
 
@@ -168,7 +169,7 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, &errors.InternalServerError{
-			Message: "Book cannot create!",
+			Message: "Book cannot create! Something went wrong.",
 		})
 	}
 
@@ -190,14 +191,27 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 // @Produce json
 // @Param data body dtos.BookUpdateRequest true "book data"
 // @Success 200 {object} response.JSONSuccessResultId
+// @Success 400 {object} errors.BadRequestError
+// @Success 500 {object} errors.InternalServerError
 // @Router /books [put]
 func (h BookHandler) UpdateBook(c echo.Context) error {
 
 	var bookUpdateRequest dtos.BookUpdateRequest
 
-	// We parse the data as json into the struct
+	// TODO: Check book exist or not (any method)
+
+	// we parse the data as json into the struct
 	if err := c.Bind(&bookUpdateRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
+			Message: fmt.Sprintf("Bad Request. It cannot be binding! %v", err.Error()),
+		})
+	}
+
+	// validation
+	if err := c.Validate(bookUpdateRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
+			Message: fmt.Sprintf("Bad Request! %v", err.Error()),
+		})
 	}
 
 	var book models.Book
@@ -211,7 +225,9 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 	result, err := h.Service.Update(book)
 
 	if err != nil || result == false {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, &errors.InternalServerError{
+			Message: "Book cannot create! Something went wrong.",
+		})
 	}
 
 	// to response id and success boolean
@@ -232,6 +248,7 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 // @Produce json
 // @Param id path string true "book ID"
 // @Success 200 {object} response.JSONSuccessResultId
+// @Success 404 {object} errors.NotFoundError
 // @Router /books/{id} [delete]
 func (h BookHandler) DeleteBook(c echo.Context) error {
 	query := c.Param("id")
@@ -239,7 +256,9 @@ func (h BookHandler) DeleteBook(c echo.Context) error {
 	result, err := h.Service.Delete(query)
 
 	if err != nil || result == false {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusNotFound, errors.NotFoundError{
+			Message: fmt.Sprintf("Not found exception: {%v} with id not found!", query),
+		})
 	}
 
 	// to response id and success boolean
