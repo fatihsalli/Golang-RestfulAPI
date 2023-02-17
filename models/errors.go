@@ -5,6 +5,11 @@ import (
 	"net/http"
 )
 
+type RequestError struct {
+	StatusCode int
+	Err        error
+}
+
 var ErrDocumentNotFound = errors.New("DocumentNotFound")
 
 func NewErrorStatusCodeMaps() map[error]int {

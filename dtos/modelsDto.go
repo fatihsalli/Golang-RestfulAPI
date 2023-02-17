@@ -22,6 +22,7 @@ type BookResponse struct {
 	Quantity int    `json:"quantity"`
 }
 
-type CreateResponse struct {
+// instead of this we use response.JSONSuccessResultId
+/*type CreateResponse struct {
 	ID string `json:"id"`
-}
+}*/

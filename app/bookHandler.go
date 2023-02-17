@@ -3,6 +3,7 @@ package app
 import (
 	"RestfulWithEcho/dtos"
 	"RestfulWithEcho/models"
+	"RestfulWithEcho/response"
 	"RestfulWithEcho/service"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -51,7 +52,6 @@ func NewBookHandler(e *echo.Echo, service service.IBookService) *BookHandler {
 // @ID get-all-books
 // @Produce json
 // @Success 200 {array} dtos.BookResponse
-// @Failure      500  {string}  Error
 // @Router /books [get]
 func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
@@ -87,7 +87,6 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 // @Produce json
 // @Param id path string true "book ID"
 // @Success 200 {object} dtos.BookResponse
-// @Failure      404  {object}  error
 // @Router /books/{id} [get]
 func (h BookHandler) GetBookById(c echo.Context) error {
 	query := c.Param("id")
@@ -119,7 +118,7 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 // @ID create-book
 // @Produce json
 // @Param data body dtos.BookCreateRequest true "book data"
-// @Success 201 {object} dtos.CreateResponse
+// @Success 201 {object} response.JSONSuccessResultId
 // @Router /books [post]
 func (h BookHandler) CreateBook(c echo.Context) error {
 
@@ -147,11 +146,13 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	// we have to return new id
-	var bookCreateResponse dtos.CreateResponse
-	bookCreateResponse.ID = result.ID
+	// to response id and success boolean
+	jsonSuccessResultId := response.JSONSuccessResultId{
+		ID:      result.ID,
+		Success: true,
+	}
 
-	return c.JSON(http.StatusCreated, bookCreateResponse)
+	return c.JSON(http.StatusCreated, jsonSuccessResultId)
 
 }
 
@@ -162,7 +163,7 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 // @ID update-book
 // @Produce json
 // @Param data body dtos.BookUpdateRequest true "book data"
-// @Success 200 {object} bool
+// @Success 200 {object} response.JSONSuccessResultId
 // @Router /books [put]
 func (h BookHandler) UpdateBook(c echo.Context) error {
 
@@ -187,8 +188,13 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	// TODO: id ve success prop struct oluşturulup result yerine
-	return c.JSON(http.StatusOK, result)
+	// to response id and success boolean
+	jsonSuccessResultId := response.JSONSuccessResultId{
+		ID:      book.ID,
+		Success: result,
+	}
+
+	return c.JSON(http.StatusOK, jsonSuccessResultId)
 
 }
 
@@ -199,7 +205,7 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 // @ID delete-book-by-id
 // @Produce json
 // @Param id path string true "book ID"
-// @Success 200 {object} bool
+// @Success 200 {object} response.JSONSuccessResultId
 // @Router /books/{id} [delete]
 func (h BookHandler) DeleteBook(c echo.Context) error {
 	query := c.Param("id")
@@ -210,5 +216,11 @@ func (h BookHandler) DeleteBook(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, result)
+	// to response id and success boolean
+	jsonSuccessResultId := response.JSONSuccessResultId{
+		ID:      query,
+		Success: result,
+	}
+
+	return c.JSON(http.StatusOK, jsonSuccessResultId)
 }
