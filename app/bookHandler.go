@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 
 type BookHandler struct {
 	Service service.IBookService
+	Logger  *logrus.Logger
 }
 
 // BookValidator echo validator for books
@@ -31,10 +33,10 @@ func (b *BookValidator) Validate(i interface{}) error {
 // for validation
 var v = validator.New()
 
-func NewBookHandler(e *echo.Echo, service service.IBookService) *BookHandler {
+func NewBookHandler(e *echo.Echo, service service.IBookService, logger *logrus.Logger) *BookHandler {
 
 	router := e.Group("api/books")
-	b := &BookHandler{Service: service}
+	b := &BookHandler{Service: service, Logger: logger}
 
 	e.Validator = &BookValidator{validator: v}
 
@@ -61,7 +63,7 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
 
 	if err != nil {
-		log.Printf("StatusInternalServerError: %v", err)
+		h.Logger.Errorf("StatusInternalServerError: %v", err)
 		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
 			Message: "Something went wrong!",
 		})
@@ -106,12 +108,12 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			log.Printf("Not found exception: {%v} with id not found!", query)
+			h.Logger.Errorf("Not found exception: {%v} with id not found!", query)
 			return c.JSON(http.StatusNotFound, errors.NotFoundError{
 				Message: fmt.Sprintf("Not found exception: {%v} with id not found!", query),
 			})
 		}
-		log.Printf("StatusInternalServerError: %v", err)
+		h.Logger.Errorf("StatusInternalServerError: %v", err)
 		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
 			Message: "Something went wrong!",
 		})

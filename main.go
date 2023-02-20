@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"os"
 )
@@ -30,6 +31,9 @@ import (
 func main() {
 	e := echo.New()
 
+	log := logrus.StandardLogger()
+	log.SetLevel(logrus.WarnLevel)
+
 	// to reach .env file
 	_ = godotenv.Load()
 	var env = os.Getenv("ENV")
@@ -44,7 +48,7 @@ func main() {
 	BookService := service.GetSingleInstancesService(BookRepository)
 
 	// to create new app
-	app.NewBookHandler(e, BookService)
+	app.NewBookHandler(e, BookService, log)
 
 	// if we don't use this swagger give an error
 	docs.SwaggerInfo.Host = "localhost:8080"
@@ -55,6 +59,7 @@ func main() {
 	//e.HTTPErrorHandler = app.NewHttpErrorHandler(models.NewErrorStatusCodeMaps()).Handler
 
 	// start server
+	log.Infof("Listening on port %s", config.Server.Port)
 	e.Logger.Print(fmt.Sprintf("Listening on port %s", config.Server.Port))
 	e.Logger.Fatal(e.Start(config.Server.Port))
 }
