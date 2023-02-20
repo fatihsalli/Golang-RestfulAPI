@@ -206,8 +206,6 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 
 	var bookUpdateRequest dtos.BookUpdateRequest
 
-	// TODO: Check book exist or not (any method)
-
 	// we parse the data as json into the struct
 	if err := c.Bind(&bookUpdateRequest); err != nil {
 		h.Logger.Errorf("Bad Request! %v", err)
@@ -221,6 +219,13 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 		h.Logger.Errorf("Bad Request! %v", err)
 		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
 			Message: fmt.Sprintf("Bad Request! %v", err.Error()),
+		})
+	}
+
+	if _, err := h.Service.GetBookById(bookUpdateRequest.ID); err != nil {
+		h.Logger.Errorf("Not found exception: {%v} with id not found!", bookUpdateRequest.ID)
+		return c.JSON(http.StatusNotFound, errors.NotFoundError{
+			Message: fmt.Sprintf("Not found exception: {%v} with id not found!", bookUpdateRequest.ID),
 		})
 	}
 
