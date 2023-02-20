@@ -11,7 +11,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 	"net/http"
 )
 
@@ -63,7 +62,7 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 	bookList, err := h.Service.GetAll()
 
 	if err != nil {
-		h.Logger.Errorf("StatusInternalServerError: %v", err)
+		h.Logger.Errorf("StatusInternalServerError: %v", err.Error())
 		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
 			Message: "Something went wrong!",
 		})
@@ -113,7 +112,7 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 				Message: fmt.Sprintf("Not found exception: {%v} with id not found!", query),
 			})
 		}
-		h.Logger.Errorf("StatusInternalServerError: %v", err)
+		h.Logger.Errorf("StatusInternalServerError: %v", err.Error())
 		return c.JSON(http.StatusInternalServerError, errors.InternalServerError{
 			Message: "Something went wrong!",
 		})
@@ -153,13 +152,14 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 
 	// We parse the data as json into the struct
 	if err := c.Bind(&bookRequest); err != nil {
-		log.Printf("Bad Request. It cannot be binding! %v", err.Error())
+		h.Logger.Errorf("Bad Request. It cannot be binding! %v", err.Error())
 		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
 			Message: fmt.Sprintf("Bad Request. It cannot be binding! %v", err.Error()),
 		})
 	}
 
 	if err := c.Validate(bookRequest); err != nil {
+		h.Logger.Errorf("Bad Request! %v", err.Error())
 		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
 			Message: fmt.Sprintf("Bad Request! %v", err.Error()),
 		})
@@ -175,6 +175,7 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 	result, err := h.Service.Insert(book)
 
 	if err != nil {
+		h.Logger.Errorf("StatusInternalServerError: %v", err.Error())
 		return c.JSON(http.StatusInternalServerError, &errors.InternalServerError{
 			Message: "Book cannot create! Something went wrong.",
 		})
@@ -209,6 +210,7 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 
 	// we parse the data as json into the struct
 	if err := c.Bind(&bookUpdateRequest); err != nil {
+		h.Logger.Errorf("Bad Request! %v", err)
 		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
 			Message: fmt.Sprintf("Bad Request. It cannot be binding! %v", err.Error()),
 		})
@@ -216,6 +218,7 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 
 	// validation
 	if err := c.Validate(bookUpdateRequest); err != nil {
+		h.Logger.Errorf("Bad Request! %v", err)
 		return c.JSON(http.StatusBadRequest, errors.BadRequestError{
 			Message: fmt.Sprintf("Bad Request! %v", err.Error()),
 		})
@@ -232,6 +235,7 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 	result, err := h.Service.Update(book)
 
 	if err != nil || result == false {
+		h.Logger.Errorf("StatusInternalServerError: {%v} ", err.Error())
 		return c.JSON(http.StatusInternalServerError, &errors.InternalServerError{
 			Message: "Book cannot create! Something went wrong.",
 		})
@@ -263,6 +267,7 @@ func (h BookHandler) DeleteBook(c echo.Context) error {
 	result, err := h.Service.Delete(query)
 
 	if err != nil || result == false {
+		h.Logger.Errorf("Not found exception: {%v} with id not found!", query)
 		return c.JSON(http.StatusNotFound, errors.NotFoundError{
 			Message: fmt.Sprintf("Not found exception: {%v} with id not found!", query),
 		})
