@@ -86,6 +86,7 @@ func (h BookHandler) GetAllBooks(c echo.Context) error {
 		Data:           booksResponse,
 	}
 
+	h.Logger.Info("All books are listed.")
 	return c.JSON(http.StatusOK, jsonSuccessResultData)
 }
 
@@ -131,8 +132,8 @@ func (h BookHandler) GetBookById(c echo.Context) error {
 		Data:           bookResponse,
 	}
 
+	h.Logger.Infof("{%v} with id is listed.", bookResponse.ID)
 	return c.JSON(http.StatusOK, jsonSuccessResultData)
-
 }
 
 // CreateBook => To post request for creating new a book
@@ -187,8 +188,8 @@ func (h BookHandler) CreateBook(c echo.Context) error {
 		Success: true,
 	}
 
+	h.Logger.Infof("{%v} with id is created.", jsonSuccessResultId.ID)
 	return c.JSON(http.StatusCreated, jsonSuccessResultId)
-
 }
 
 // UpdateBook => To put request for changing exist book
@@ -252,8 +253,8 @@ func (h BookHandler) UpdateBook(c echo.Context) error {
 		Success: result,
 	}
 
+	h.Logger.Infof("{%v} with id is updated.", jsonSuccessResultId.ID)
 	return c.JSON(http.StatusOK, jsonSuccessResultId)
-
 }
 
 // DeleteBook => To delete request by id as a parameter
@@ -284,5 +285,6 @@ func (h BookHandler) DeleteBook(c echo.Context) error {
 		Success: result,
 	}
 
+	h.Logger.Infof("{%v} with id is deleted.", jsonSuccessResultId.ID)
 	return c.JSON(http.StatusOK, jsonSuccessResultId)
 }
