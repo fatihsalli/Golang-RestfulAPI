@@ -32,6 +32,12 @@ func main() {
 	e := echo.New()
 
 	log := logrus.StandardLogger()
+
+	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.SetOutput(file)
 	log.SetLevel(logrus.WarnLevel)
 
 	// to reach .env file

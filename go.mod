@@ -7,6 +7,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.10.0
+	github.com/sirupsen/logrus v1.9.0
 	github.com/swaggo/echo-swagger v1.3.5
 	github.com/swaggo/swag v1.8.10
 	go.mongodb.org/mongo-driver v1.11.1
@@ -30,7 +31,6 @@ require (
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/swaggo/files v1.0.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
