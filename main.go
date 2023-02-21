@@ -38,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.SetOutput(file)
-	log.SetLevel(logrus.WarnLevel)
+	log.SetLevel(logrus.InfoLevel)
 
 	// to reach .env file
 	_ = godotenv.Load()
