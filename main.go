@@ -53,6 +53,10 @@ func main() {
 	// to create new service with singleton pattern
 	BookService := service.GetSingleInstancesService(BookRepository)
 
+	fmt.Println("Book Service address of value", &BookService)
+	fmt.Println("Logger address of value", &log)
+	fmt.Println("Echo context address of value", &e)
+
 	// to create new app
 	app.NewBookHandler(e, BookService, log)
 

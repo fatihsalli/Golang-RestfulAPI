@@ -32,10 +32,14 @@ func (b *BookValidator) Validate(i interface{}) error {
 // for validation
 var v = validator.New()
 
-func NewBookHandler(e *echo.Echo, service service.IBookService, logger *logrus.Logger) *BookHandler {
+func NewBookHandler(e *echo.Echo, service service.IBookService, log *logrus.Logger) *BookHandler {
+
+	fmt.Println("Book Service address of value", &service)
+	fmt.Println("Logger address of value", &log)
+	fmt.Println("Echo context address of value", &e)
 
 	router := e.Group("api/books")
-	b := &BookHandler{Service: service, Logger: logger}
+	b := &BookHandler{Service: service, Logger: log}
 
 	e.Validator = &BookValidator{validator: v}
 
