@@ -13,7 +13,8 @@ type BookService struct {
 	Repository repository.IBookRepository
 }
 
-// with singleton pattern to create just one Service we have to write like this or using once. Otherwise, every thread will create new Service.
+// With singleton pattern to create just one Service we have to write like this or using once.
+// => Otherwise, every thread will create new Service.
 // var lock = &sync.Mutex{}
 var singleInstanceService *BookService
 

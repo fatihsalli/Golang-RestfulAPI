@@ -146,5 +146,4 @@ func (b BookRepository) Delete(id string) (bool, error) {
 	}
 
 	return true, nil
-
 }
