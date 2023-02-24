@@ -65,9 +65,6 @@ func main() {
 	// add swagger
 	e.GET("/swagger/*any", echoSwagger.WrapHandler)
 
-	// custom response
-	//e.HTTPErrorHandler = app.NewHttpErrorHandler(models.NewErrorStatusCodeMaps()).Handler
-
 	// start server
 	log.Infof("Listening on port %s", config.Server.Port)
 	e.Logger.Print(fmt.Sprintf("Listening on port %s", config.Server.Port))
