@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 )
@@ -58,9 +57,6 @@ func (b BookRepository) Update(book models.Book) (bool, error) {
 	// to open connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
-	// to change updated date
-	book.UpdatedDate = primitive.NewDateTimeFromTime(time.Now())
 
 	// => Update => update + insert = upsert => default value false
 	// opt := options.Update().SetUpsert(true)
