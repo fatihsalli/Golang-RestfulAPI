@@ -31,6 +31,7 @@ import (
 func main() {
 	e := echo.New()
 
+	// TODO: echodaki log değiştirilecek
 	log := logrus.StandardLogger()
 
 	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)

@@ -34,9 +34,11 @@ var v = validator.New()
 
 func NewBookHandler(e *echo.Echo, service service.IBookService, log *logrus.Logger) *BookHandler {
 
-	fmt.Println("Book Service address of value", &service)
-	fmt.Println("Logger address of value", &log)
-	fmt.Println("Echo context address of value", &e)
+	// TODO: Objenin referansı nasıl basılır & ifadesi doğru mudur? Go da singleton transient vs. nasıl yapılacak?
+	// TODO: ok handler (test) servis bağlayıp - serviste değişken tutup default false inialize edildiğinde set edilsin.
+	fmt.Println("Book Service address of value", service)
+	fmt.Println("Logger address of value", log)
+	fmt.Println("Echo context address of value", e)
 
 	router := e.Group("api/books")
 	b := &BookHandler{Service: service, Logger: log}
